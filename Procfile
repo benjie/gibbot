@@ -1,1 +1,1 @@
-web: bin/hubot -a campfire -n Gibbot
+web: bin/gibbot -a campfire -n Gibbot
