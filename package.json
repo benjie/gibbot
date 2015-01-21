@@ -1,0 +1,32 @@
+{
+    "name": "gibbot",
+    "version": "0.0.0",
+    "description": "A robot to serve the gibbons",
+    "private": true,
+    "dependencies": {
+        "cheerio": "~0.18",
+        "htmlparser": "~1.7",
+        "hubot": "^2.11.0",
+        "hubot-diagnostics": "0.0.1",
+        "hubot-google-images": "^0.1.2",
+        "hubot-google-translate": "^0.1.0",
+        "hubot-help": "^0.1.1",
+        "hubot-heroku-keepalive": "0.0.4",
+        "hubot-maps": "0.0.1",
+        "hubot-pugme": "^0.1.0",
+        "hubot-redis-brain": "0.0.2",
+        "hubot-rules": "^0.1.0",
+        "hubot-scripts": "^2.5.16",
+        "hubot-shipit": "^0.1.1",
+        "hubot-youtube": "^0.1.2",
+        "moment": "~2.8",
+        "numeral": "~1.5",
+        "rsvp": "~3.0",
+        "soupselect": "~0.2",
+        "underscore": "~1.7",
+        "request": "~2.49"
+    },
+    "engines": {
+        "node": "0.10.x"
+    }
+}
