@@ -9,7 +9,7 @@ randomBetween = require('./helpers/random').randomBetween
 
 module.exports = (robot) ->
   robot.hear /\b(gibbot)\b/i, (msg) ->
-  	result = randomBetween(1, 50)
+    result = randomBetween(1, 50)
     if result == 16
       msg.send 'http://i60.tinypic.com/34hx3fa.png'
     else if result == 24
