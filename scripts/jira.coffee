@@ -8,60 +8,38 @@
 
 module.exports = (robot) ->
 
-  auth = process.env.JIRA_AUTH
-  baseUrl = "http://#{auth}@powerplant.nature.com/jira/rest"
-  gibbonBoardId = 53
-  unless auth
+  unless process.env.JIRA_AUTH
     console.log '[WARNING] No Jira auth details are present. Set the JIRA_AUTH environment variable to username:password'
 
+  jira = require('./helpers/jira').create({
+    auth: process.env.JIRA_AUTH,
+    storyPointsField: 'customfield_10163'
+  })
+
+  gibbonBoardId = 53
+
   robot.respond /how many points (is|has) ([A-Z]+\-\d+)/i, (msg) ->
-    url = "#{baseUrl}/api/latest/issue/#{msg.match[2]}"
-    msg.http(url).get() (err, res, body) ->
-      try
-        issue = JSON.parse body
-        points = issue?.fields?.customfield_10163
-        if points == undefined
-          msg.reply "Sorry, I can't seem to find #{msg.match[2]}"
-        else
-          if points == null
-            points = 0
-          msg.reply "#{msg.match[2]} has #{points} story points"
-      catch err
-        msg.reply 'There was an error with the Jira API'
+    jira.getIssueStoryPoints msg.match[2], (err, points) ->
+      return msg.reply 'There was an error with the Jira API' if err
+      if points == undefined
+        msg.reply "Sorry, I can't seem to find #{msg.match[2]}"
+      else
+        msg.reply "#{msg.match[2]} has #{points || 0} story points"
 
   robot.respond /how many points are in the sprint/i, (msg) ->
-    url = "#{baseUrl}/greenhopper/1.0/xboard/work/allData/?rapidViewId=#{gibbonBoardId}"
-    msg.http(url).get() (err, res, body) ->
-      try
-        board = JSON.parse body
-        totalPoints = board.issuesData.issues
-          .filter((issue) ->
-            (typeof issue.estimateStatistic?.statFieldValue?.value == 'number')
-          )
-          .map((issue) ->
-            issue.estimateStatistic.statFieldValue.value
-          )
-          .reduce((total, points) ->
-            total + points
-          , 0)
-        console.log totalPoints
-        msg.reply "There are #{totalPoints} story points in the current sprint"
-      catch err
-        msg.reply 'There was an error with the Jira API'
+    jira.getBoardStoryPoints gibbonBoardId, (err, points) ->
+      return msg.reply 'There was an error with the Jira API' if err
+      msg.reply "There are #{points} story points in the current sprint"
 
   robot.respond /list completed (stories|issues|tickets)/i, (msg) ->
-    url = "#{baseUrl}/greenhopper/1.0/xboard/work/allData/?rapidViewId=#{gibbonBoardId}"
-    msg.http(url).get() (err, res, body) ->
-      try
-        board = JSON.parse body
-        completedStories = board.issuesData.issues
-          .filter((issue) ->
-            issue.done
-          )
-          .map((issue) ->
-            "#{issue.key}:  #{issue.summary}"
-          )
-          .join('\n')
-        msg.send "Here are the completed stories:\n#{completedStories}"
-      catch err
-        msg.reply 'There was an error with the Jira API'
+    jira.getBoard gibbonBoardId, (err, board) ->
+      return msg.reply 'There was an error with the Jira API' if err
+      completedStories = board.issuesData.issues
+        .filter((issue) ->
+          issue.done
+        )
+        .map((issue) ->
+          "#{issue.key}:  #{issue.summary}"
+        )
+        .join('\n')
+      msg.send "Here are the completed stories:\n#{completedStories}"
