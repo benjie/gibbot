@@ -34,12 +34,12 @@ class Jira
         done null, (points || 0)
 
   # Get a single Jira board
-  getBoard: (id, done) ->
-    @get "/greenhopper/1.0/xboard/work/allData/?rapidViewId=#{id}", done
+  getBoard: (boardId, done) ->
+    @get "/greenhopper/1.0/xboard/work/allData/?rapidViewId=#{boardId}", done
 
   # Get story points for a Jira board
-  getBoardStoryPoints: (id, done) ->
-    @getBoard id, (err, board) ->
+  getBoardStoryPoints: (boardId, done) ->
+    @getBoard boardId, (err, board) ->
       return done err if err
       totalPoints = board.issuesData.issues
         .filter((issue) ->
@@ -52,6 +52,18 @@ class Jira
           total + points
         , 0)
       done null, totalPoints
+
+  # Get issues in a Jira board
+  getBoardIssues: (boardId, done) ->
+    @getBoard boardId, (err, board) ->
+      return done err if err
+      done null, board.issuesData.issues
+
+  # Get completed issues in a Jira board
+  getBoardCompletedIssues: (boardId, done) ->
+    @getBoardIssues boardId, (err, issues) ->
+      return done err if err
+      done null, issues.filter((issue) -> issue.done)
 
 # Convenience function for creating a Jira object
 createJiraInstance = (opts) ->
