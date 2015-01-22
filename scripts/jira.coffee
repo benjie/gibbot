@@ -2,12 +2,15 @@
 #   JIRA integration
 #
 # Commands:
-#   hubot how many points is X - Get the story points for a ticket
+#   hubot how many points is X? - Get the story points for a ticket
+#   hubot how many points are in the sprint? - Get the total story points for the sprint
+#   hubot list completed stories - Get a list of the completed stories in the current sprint
 
 module.exports = (robot) ->
 
   auth = process.env.JIRA_AUTH
   baseUrl = "http://#{auth}@powerplant.nature.com/jira/rest"
+  gibbonBoardId = 53
   unless auth
     console.log '[WARNING] No Jira auth details are present. Set the JIRA_AUTH environment variable to username:password'
 
@@ -25,7 +28,6 @@ module.exports = (robot) ->
         msg.reply 'There was an error with the Jira API'
 
   robot.respond /how many points are in the sprint/i, (msg) ->
-    gibbonBoardId = 53
     url = "#{baseUrl}/greenhopper/1.0/xboard/work/allData/?rapidViewId=#{gibbonBoardId}"
     msg.http(url).get() (err, res, body) ->
       try
@@ -42,5 +44,22 @@ module.exports = (robot) ->
           , 0)
         console.log totalPoints
         msg.reply "There are #{totalPoints} story points in the current sprint"
+      catch err
+        msg.reply 'There was an error with the Jira API'
+
+  robot.respond /list completed (stories|issues|tickets)/i, (msg) ->
+    url = "#{baseUrl}/greenhopper/1.0/xboard/work/allData/?rapidViewId=#{gibbonBoardId}"
+    msg.http(url).get() (err, res, body) ->
+      try
+        board = JSON.parse body
+        completedStories = board.issuesData.issues
+          .filter((issue) ->
+            issue.done
+          )
+          .map((issue) ->
+            "#{issue.key}:  #{issue.summary}"
+          )
+          .join('\n')
+        msg.send "Here are the completed stories:\n#{completedStories}"
       catch err
         msg.reply 'There was an error with the Jira API'
