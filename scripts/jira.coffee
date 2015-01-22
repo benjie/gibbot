@@ -50,7 +50,7 @@ module.exports = (robot) ->
       sprintEndDate = moment(sprint?.endDate).format('Do MMM')
       sprintDaysRemaining = sprint?.daysRemaining
 
-      sprintAllIssues = board.issuesData.issues;
+      sprintAllIssues = board.issuesData.issues
       sprintCompletedIssues = board.issuesData.issues.filter((issue) -> issue.done)
 
       getStoryPointsForIssue = (issue) -> issue.estimateStatistic?.statFieldValue?.value
