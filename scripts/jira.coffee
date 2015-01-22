@@ -20,10 +20,12 @@ module.exports = (robot) ->
       try
         issue = JSON.parse body
         points = issue?.fields?.customfield_10163
-        if points != undefined && points != null
-          msg.reply "#{msg.match[2]} has #{points} story points"
-        else
+        if points == undefined
           msg.reply "Sorry, I can't seem to find #{msg.match[2]}"
+        else
+          if points == null
+            points = 0
+          msg.reply "#{msg.match[2]} has #{points} story points"
       catch err
         msg.reply 'There was an error with the Jira API'
 
