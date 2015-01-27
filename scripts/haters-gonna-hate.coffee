@@ -3,4 +3,4 @@
 
 module.exports = (robot) ->
   robot.hear /\bhaters (gonna|going to) hate\b/i, (msg) ->
-    msg.send 'http://i.imgur.com/NAtS7u3.jpg'
+    msg.send 'https://tctechcrunch2011.files.wordpress.com/2012/10/haters-gonna-hate.gif'
