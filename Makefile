@@ -10,7 +10,4 @@ deps:
 # Lint CoffeeScript
 lint:
 	@echo "Linting CoffeeScript..."
-	@./node_modules/.bin/coffeelint \
-		-f ./test/coffeelint.json \
-    ./scripts/helpers/* \
-		./scripts/*
+	@npm run lint
